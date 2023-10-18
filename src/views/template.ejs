@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="css/template.css" />
+  </head>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+    table,
+    th,
+    td {
+      border: 1px solid black;
+    }
+    html {
+      zoom: 0.55;
+    }
+    body,
+    html {
+      color: rgb(46, 46, 46);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    th {
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    .header {
+      padding: 60px;
+      text-align: left;
+      font-size: 15px;
+    }
+  </style>
+
+  <body style="height: 100vh">
+    <div style="text-align: right; margin-top: 500px; margin-right: 50px">
+      Внимание! Оплата данного счета означает согласие с условиями поставки
+      товара. Уведомление <br />об оплате обязательно, товар на производство
+      отправляется только после прихода денег на р/с <br />
+      Поставщика
+    </div>
+    <div style="margin-left: 50px; margin-bottom: 20px">
+      Образец платежного поручения
+    </div>
+    <table style="width: 80%; margin-left: 80px">
+      <tr>
+        <th style="text-align: left; font-size: 20px">
+          Бенецивер: <br /><%-reportdata.IP%> <br />ИИН :
+        </th>
+        <th style="font-size: 20px">ИИК <br /><%-reportdata.IIK%></th>
+        <th style="font-size: 20px">Кбе <br /><%-reportdata.kbe%></th>
+      </tr>
+      <tr>
+        <td style="font-size: 20px">
+          Банк бенефициара:<br /><%-reportdata.bank%>
+        </td>
+        <td style="text-align: center; font-size: 20px">
+          БИК <br /><%-reportdata.bik%>
+        </td>
+        <td style="text-align: cente; font-size: 20px">
+          Код назначения платежа <br />
+          <%-reportdata.cod%>
+        </td>
+      </tr>
+    </table>
+    <div style="margin-top: 20px; margin-left: 40px">
+      <hr style="color: black" />
+      <div
+        style="
+          font-weight: bold;
+          font-size: 20px;
+          margin-top: 10px;
+          color: black;
+        ">
+        Счет на оплату N <%-reportdata.номер%> от <%-reportdata.today%>
+      </div>
+      <div style="margin-top: 10px">
+        Поставщик : БИН/ИИН <%-reportdata.bin%> <%-reportdata.IP%>
+        <%-reportdata.address%>
+      </div>
+      <div style="margin-top: 10px">
+        Покупатель :БИН/ИИН <%-reportdata.bin2%> <%-reportdata.nameFirmy%>
+        <%-reportdata.address2%>
+      </div>
+      <div style="margin-top: 10px">Договор : <%-reportdata.dogovor%></div>
+    </div>
+    <table style="width: 100%; margin-top: 50px">
+      <tr>
+        <th style="font-size: 20px">№</th>
+        <th style="font-size: 20px">Наименование</th>
+        <th style="font-size: 20px">Кол-во</th>
+        <th style="font-size: 20px">Цена</th>
+        <th style="font-size: 20px">Сумма</th>
+      </tr>
+      <tr>
+        <th style="font-size: 20px"><%-reportdata.esf.n%></th>
+        <th style="font-size: 20px"><%-reportdata.esf.Наименование%></th>
+
+        <th style="font-size: 20px"><%-reportdata.esf.efs1%></th>
+        <th style="font-size: 20px"><%-reportdata.esf.kol_vo%></th>
+        <th style="font-size: 20px"><%-reportdata.esf.summa%></th>
+      </tr>
+    </table>
+
+    <div
+      class="itogo"
+      style="text-align: right; font-size: 20px; margin-right: 40px">
+      <div>Итого: <br />Без НДС</div>
+      <div style="text-align: right"><%-reportdata.itogoEsf%> тг</div>
+    </div>
+    <div style="font-size: 20px">
+      Всего наименований <%-reportdata.col%> на сумму <%-reportdata.itogoEsf%>
+      KZT
+    </div>
+    <div style="font-weight: bold">Всего к оплате:<%-reportdata.itogoEsf%></div>
+    <hr style="color: black" />
+    <div style="margin-top: 20px; position: relative">
+      Руководитель: _______________________ /<%-reportdata.rukovaditel%>/
+
+      <br />Главный бухгалтер: не предусмотрен
+      <img
+        src="<%-reportdata.pechat%>"
+        style="
+          width: 100px;
+          height: 100px;
+          position: absolute;
+          bottom: 4px;
+          margin-left: 120px;
+        " />
+    </div>
+  </body>
+</html>
