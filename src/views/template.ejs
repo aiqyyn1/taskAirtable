@@ -4,19 +4,21 @@
     <link rel="stylesheet" href="css/template.css" />
   </head>
   <style>
+  
     table {
       border-collapse: collapse;
     }
     table,
     th,
     td {
-      border: 1px solid black;
+      border: 2px solid black;
     }
     html {
       zoom: 0.55;
     }
     body,
     html {
+      font-family:Georgia, 'Times New Roman', Times, serif;
       color: rgb(46, 46, 46);
     }
     * {
@@ -37,7 +39,7 @@
   </style>
 
   <body style="height: 100vh">
-    <div style="text-align: right; margin-top: 500px; margin-right: 50px">
+    <div style="text-align: right; margin-right: 50px">
       Внимание! Оплата данного счета означает согласие с условиями поставки
       товара. Уведомление <br />об оплате обязательно, товар на производство
       отправляется только после прихода денег на р/с <br />
@@ -49,7 +51,7 @@
     <table style="width: 80%; margin-left: 80px">
       <tr>
         <th style="text-align: left; font-size: 20px">
-          Бенецивер: <br /><%-reportdata.IP%> <br />ИИН :
+          Бенефицар: <br /><%-reportdata.IP%> <br />ИИН :
         </th>
         <th style="font-size: 20px">ИИК <br /><%-reportdata.IIK%></th>
         <th style="font-size: 20px">Кбе <br /><%-reportdata.kbe%></th>
@@ -76,7 +78,7 @@
           margin-top: 10px;
           color: black;
         ">
-        Счет на оплату N <%-reportdata.номер%> от <%-reportdata.today%>
+        Счет на оплату № <%-reportdata.номер%> от <%-reportdata.today%>
       </div>
       <div style="margin-top: 10px">
         Поставщик : БИН/ИИН <%-reportdata.bin%> <%-reportdata.IP%>
@@ -88,6 +90,7 @@
       </div>
       <div style="margin-top: 10px">Договор : <%-reportdata.dogovor%></div>
     </div>
+
     <table style="width: 100%; margin-top: 50px">
       <tr>
         <th style="font-size: 20px">№</th>
@@ -96,14 +99,15 @@
         <th style="font-size: 20px">Цена</th>
         <th style="font-size: 20px">Сумма</th>
       </tr>
+      <% reportdata.esf.forEach(function(es) { %>
       <tr>
-        <th style="font-size: 20px"><%-reportdata.esf.n%></th>
-        <th style="font-size: 20px"><%-reportdata.esf.Наименование%></th>
-
-        <th style="font-size: 20px"><%-reportdata.esf.efs1%></th>
-        <th style="font-size: 20px"><%-reportdata.esf.kol_vo%></th>
-        <th style="font-size: 20px"><%-reportdata.esf.summa%></th>
+        <th style="font-size: 20px"><%= es.n %></th>
+        <th style="font-size: 20px"><%= es.Наименование %></th>
+        <th style="font-size: 20px">тнг<%= es.efs1 %></th>
+        <th style="font-size: 20px">шт<%= es.kol_vo %></th>
+        <th style="font-size: 20px">тнг<%= es.summa %></th>
       </tr>
+      <% }) %>
     </table>
 
     <div
@@ -116,21 +120,33 @@
       Всего наименований <%-reportdata.col%> на сумму <%-reportdata.itogoEsf%>
       KZT
     </div>
-    <div style="font-weight: bold">Всего к оплате:<%-reportdata.itogoEsf%></div>
+    <div style="font-weight: bold">
+      Всего к оплате:<%-reportdata.itogoEsf%> тг
+    </div>
     <hr style="color: black" />
-    <div style="margin-top: 20px; position: relative">
-      Руководитель: _______________________ /<%-reportdata.rukovaditel%>/
-
-      <br />Главный бухгалтер: не предусмотрен
+    <div style="margin-top: 40px; position: relative">
+      <div>
+        Руководитель: _______________________ /<%-reportdata.rukovaditel%>/
+      </div>
       <img
-        src="<%-reportdata.pechat%>"
+        src="https://v5.airtableusercontent.com/v2/23/23/1701100800000/yBvy6DjvN66oAgLe95oCYg/VH_WHx9dr0MH8R_BlGiEJJ51aCSe_ppydgm_R6XHN-oKAeUsJDM-wmf6UOFaXOfNveT756FZ5MVgvmIweUhzpj3K2YLxJ06hV4w0Fejdhaug0hF0-oezHiwia1WSg0D8_gfBMf1IgA3bbez6mZ9nvg/zUiBVGYdCOocLNeeM_tdNYS7cNlCAd2CfY17kDgARrk"
         style="
           width: 100px;
           height: 100px;
           position: absolute;
-          bottom: 4px;
-          margin-left: 120px;
+
+          margin-left: 440px;
         " />
+      <img
+        style="
+          width: 50px;
+          height: 50px;
+          position: absolute;
+          bottom: 1px;
+          margin-left: 185px;
+        "
+        src="https://v5.airtableusercontent.com/v2/23/23/1701100800000/HaBZHTkyN-IOiibmIcpXMg/VSoMbTLrhDCht1ZPZnUwNY5JFwVnidGUhbt8-cGRrmANXZzGKpckSzcDCdbwFyOFkpuUTdAgnIAOwilMYpcMN4M_sLeKFPMJ__HaWnKMy2E89HtDVLC0NGtllctWDhEUTWbUKq7pb3SIRnTWwNn-cC5hJtmAx1Z4EkkTQ85TElVCapGDAOtctG2akOazhpar/P01frnjG61foVdeJ1QyrukbkVqUWTaMMT0KjlJP_jrE" />
     </div>
+    <div><br />Главный бухгалтер: не предусмотрен</div>
   </body>
 </html>
