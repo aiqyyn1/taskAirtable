@@ -35,7 +35,7 @@ reportRouter.get('/blanks', async (req, res) => {
     const address2 = record.get('адрес 3');
     const address = record.get('адрес (from ИП)');
     const dogovor = record.get('договор для счет оплаты');
-    
+   
     const date= String(record.get("today")).split('-');
     const today = date[2]+"-"+date[1]+"-"+date[0]
     const itogoEsf = record.get('итого ЭСФ');
@@ -62,6 +62,7 @@ reportRouter.get('/blanks', async (req, res) => {
       rukovaditel: rukovaditel,
       pechat: pechat,
       rospis: rospis,
+      nomer:nomer
     };
     const filename = name + '.pdf';
 
