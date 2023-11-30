@@ -11,7 +11,19 @@ Airtable.configure({
   apiKey: process.env.API_KEY,
 });
 const base = Airtable.base(process.env.BASE);
+const formatSumma = (summa) => {
+  return (summa = summa
+    .replace(
+        new RegExp(
+            '^(\\d{' + (summa.length % 3 ? summa.length % 3 : 0) + '})(\\d{3})',
+            'g'
+        ),
+        '$1,$2'
+    )
+    .replace(/(\d{3})(?=\d)/g, '$1,') // Replace space with a comma only if followed by another digit
+    .trim());
 
+};
 reportRouter.get('/blanks', async (req, res) => {
   const recordID = req.query.recordID;
 
@@ -35,10 +47,10 @@ reportRouter.get('/blanks', async (req, res) => {
     const address2 = record.get('адрес 3');
     const address = record.get('адрес (from ИП)');
     const dogovor = record.get('договор для счет оплаты');
-   
-    const date= String(record.get("today")).split('-');
-    const today = date[2]+"-"+date[1]+"-"+date[0]
-    const itogoEsf = record.get('итого ЭСФ');
+
+    const date = String(record.get('today')).split('-');
+    const today = date[2] + '-' + date[1] + '-' + date[0];
+    const itogoEsf = String(record.get('итого ЭСФ'));
     const col = record.get('кол-во наименований');
     const rukovaditel = record.get('руководитель (from ИП)');
     let airtableData = {
@@ -57,12 +69,12 @@ reportRouter.get('/blanks', async (req, res) => {
       address2: address2,
       dogovor: dogovor,
       esf: esf,
-      itogoEsf: itogoEsf,
+      itogoEsf: formatSumma(itogoEsf),
       col: col,
       rukovaditel: rukovaditel,
       pechat: pechat,
       rospis: rospis,
-      nomer:nomer
+      nomer: nomer,
     };
     const filename = name + '.pdf';
 
@@ -109,15 +121,14 @@ async function fetchEsfData(recordID) {
                 const naimenovanie = record.get('Наименование1');
                 const efcCena = record.get('ЭФС Цена');
                 const kol_vo = record.get('Кол-во');
-                const summa = record.get('Сумма');
+                let summa = String(record.get('Сумма'));
 
-                // console.log(chertezh[0].url)
                 esf.push({
                   Наименование: naimenovanie,
                   n: n,
                   efs1: efcCena,
                   kol_vo: kol_vo,
-                  summa: summa,
+                  summa: formatSumma(summa),
                 });
               }
             });

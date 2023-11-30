@@ -17,7 +17,7 @@
     }
     body,
     html {
-      font-family: Georgia, 'Times New Roman', Times, serif;
+      font-family:Verdana, Geneva, Tahoma, sans-serif;
       color: rgb(46, 46, 46);
     }
     * {
@@ -38,7 +38,7 @@
   </style>
 
   <body style="height: 100vh">
-    <div style="text-align: right; margin-right: 50px">
+    <div style="text-align: right; margin-right: 50px; margin-top: 70px;">
       Внимание! Оплата данного счета означает согласие с условиями поставки
       товара. Уведомление <br />об оплате обязательно, товар на производство
       отправляется только после прихода денег на р/с <br />
@@ -47,7 +47,7 @@
     <div style="margin-left: 50px; margin-bottom: 20px">
       Образец платежного поручения
     </div>
-    <table style="width: 80%; margin-left: 80px">
+    <table style="width: 80%; margin-left: 80px;">
       <tr>
         <th style="text-align: left; font-size: 20px">
           Бенефицар: <br /><%-reportdata.IP%> <br />ИИН : <%-reportdata.bin%>
@@ -84,14 +84,14 @@
         <%-reportdata.address%>
       </div>
       <div style="margin-top: 10px">
-        Покупатель :БИН/ИИН <%-reportdata.bin2%> <%-reportdata.nameFirmy%>
+        Покупатель : БИН/ИИН <%-reportdata.bin2%> <%-reportdata.nameFirmy%>
         <%-reportdata.address2%>
       </div>
       <div style="margin-top: 10px">Договор : <%-reportdata.dogovor%></div>
     </div>
-
-    <table style="width: 100%; margin-top: 50px">
-      <tr>
+  <div style=" width: 95%; margin-left: 20px;">
+    <table style="width: 100%;height:100%; margin-top:50px;">
+      <tr  >
         <th style="font-size: 20px">№</th>
         <th style="font-size: 20px">Наименование</th>
         <th style="font-size: 20px">Кол-во</th>
@@ -99,15 +99,16 @@
         <th style="font-size: 20px">Сумма</th>
       </tr>
       <% reportdata.esf.forEach(function(es) { %>
-      <tr>
+      <tr >
         <th style="font-size: 20px"><%= es.n %></th>
         <th style="font-size: 20px; overflow: hidden;"><%= es.Наименование %></th>
-        <th style="font-size: 20px">тнг<%= es.efs1 %></th>
-        <th style="font-size: 20px">шт<%= es.kol_vo %></th>
-        <th style="font-size: 20px">тнг<%= es.summa %></th>
+        <th style="font-size: 20px">тнг <%= es.efs1 %></th>
+        <th style="font-size: 20px">шт <%= es.kol_vo %></th>
+        <th style="font-size: 20px">тнг <%= es.summa %></th>
       </tr>
       <% }) %>
     </table>
+  </div>
 
     <div
       class="itogo"
@@ -115,20 +116,20 @@
         position: absolute;
         right: 0;
         font-size: 20px;
-        margin-right: 130px;
+        margin-right: 160px;
         display: flex;
       ">
       <div>Итого: <br />Без НДС</div>
     </div>
-    <div style="position: absolute; right: 0;     font-size: 20px; margin-right: 20px; margin-top: 5px;">
+    <div style="position: absolute; right: 0;    font-size: 20px; margin-right: 20px; margin-top: 5px;">
       <%-reportdata.itogoEsf%> тг
     </div>
     <div style="margin-top: 60px;">
-    <div style="font-size: 20px">
+    <div style="font-size: 20px;">
       Всего наименований <%-reportdata.col%> на сумму <%-reportdata.itogoEsf%>
       KZT
     </div>
-    <div style="font-weight: bold">
+    <div style="font-weight: bold ">
       Всего к оплате:<%-reportdata.itogoEsf%> тг
     </div>
     <hr style="color: black" />
