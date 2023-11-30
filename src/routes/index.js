@@ -15,12 +15,12 @@ const formatSumma = (summa) => {
   return (summa = summa
     .replace(
         new RegExp(
-            '^(\\d{' + (summa.length % 3 ? summa.length % 3 : 0) + '})(\\d{3})',
+            '^(\\d{1,2}|\\d{4})(\\d{3})',
             'g'
         ),
         '$1,$2'
     )
-    .replace(/(\d{3})(?=\d)/g, '$1,') // Replace space with a comma only if followed by another digit
+    .replace(/(\d{3})(?=\d)(?!$)/g, '$1,')
     .trim());
 
 };
