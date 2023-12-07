@@ -6,6 +6,10 @@
     <title>Document</title>
   </head>
   <style>
+    body {
+      margin: 0;
+    }
+
     table {
       border-collapse: collapse;
     }
@@ -21,149 +25,210 @@
     * {
       margin: 0;
       padding: 0;
-      /* box-sizing: border-box; */
+      box-sizing: border-box;
     }
   </style>
   <body>
-    <div style="text-align: right; margin-right: 50px; margin-top: 70px">
-      Внимание! Оплата данного счета означает согласие с условиями поставки
-      товара. Уведомление <br />об оплате обязательно, товар на производство
-      отправляется только после прихода денег на р/с <br />
-      Поставщика
-    </div>
-    <div style="margin-left: 50px; margin-bottom: 20px">
-      Образец платежного поручения
-    </div>
-    <table style="width: 80%; margin-left: 50px">
-      <tr>
-        <th style="text-align: left; font-size: 20px">
-          Бенефицар: <br /><%-reportdata.IP%> <br />ИИН : <%-reportdata.bin%>
-        </th>
-        <th style="font-size: 20px">ИИК <br /><%-reportdata.IIK%></th>
-        <th style="font-size: 20px">Кбе <br /><%-reportdata.kbe%></th>
-      </tr>
-      <tr>
-        <td style="font-size: 20px">
-          Банк бенефициара:<br /><%-reportdata.bank%>
-        </td>
-        <td style="text-align: center; font-size: 20px">
-          БИК <br /><%-reportdata.bik%>
-        </td>
-        <td style="text-align: center; font-size: 20px">
-          Код назначения платежа <br />
-          <%-reportdata.cod%>
-        </td>
-      </tr>
-    </table>
-    <div style="margin-top: 20px; margin-left: 40px">
+    <div style="margin-left: 20px;">
+      <div style="text-align: right; margin-right: 50px; margin-top: 70px">
+        Внимание! Оплата данного счета означает согласие с условиями поставки
+        товара. Уведомление <br />об оплате обязательно, товар на производство
+        отправляется только после прихода денег на р/с <br />
+        Поставщика
+      </div>
+      <div style="margin-left: 50px; margin-bottom: 20px">
+        Образец платежного поручения
+      </div>
+      <table style="width: 80%; margin-left: 50px">
+        <tr>
+          <th style="text-align: left; font-size: 20px">
+            Бенефицар: <br /><%-reportdata.IP%> <br />ИИН : <%-reportdata.bin%>
+          </th>
+          <th style="font-size: 20px">ИИК <br /><%-reportdata.IIK%></th>
+          <th style="font-size: 20px">Кбе <br /><%-reportdata.kbe%></th>
+        </tr>
+        <tr>
+          <td style="font-size: 20px">
+            Банк бенефициара:<br /><%-reportdata.bank%>
+          </td>
+          <td style="text-align: center; font-size: 20px">
+            БИК <br /><%-reportdata.bik%>
+          </td>
+          <td style="text-align: center; font-size: 20px">
+            Код назначения платежа <br />
+            <%-reportdata.cod%>
+          </td>
+        </tr>
+      </table>
+      <div style="margin-top: 20px; margin-left: 40px">
+        <div
+          style="
+            font-weight: bold;
+            font-size: 20px;
+            margin-top: 10px;
+            color: black;
+          ">
+          Счет на оплату № <%-reportdata.nomer%> от <%-reportdata.today%>
+          <hr style="background-color: black" />
+        </div>
+        <div style="margin-top: 10px">
+          Поставщик :
+          <span style="font-weight: bold ; font-size: 15px;"
+            >БИН/ИИН <%-reportdata.bin%> <%-reportdata.IP%>
+            <%-reportdata.address%>
+          </span>
+        </div>
+        <div style="margin-top: 10px">
+          Покупатель :
+          <span style="font-weight: bold"
+            >БИН/ИИН <%-reportdata.bin2%> <%-reportdata.nameFirmy%>
+            <%-reportdata.address2%>
+          </span>
+        </div>
+        <div style="margin-top: 10px">
+          Договор :
+          <span style="font-weight: bold"><%-reportdata.dogovor%></span>
+        </div>
+      </div>
+
+      <table
+        style="
+          width: 90%;
+          margin-left: 35px;
+          text-align: left;
+          margin-top: 50px;
+        ">
+        <tr style="height: 40px">
+          <th
+            style="
+              font-size: 20px;
+              font-weight: bold;
+              color: black;
+              padding: 5px;
+            ">
+            №
+          </th>
+          <th
+            style="
+              font-size: 20px;
+              font-weight: bold;
+              color: black;
+              padding: 5px;
+            ">
+            Наименование
+          </th>
+          <th
+            style="
+              font-size: 20px;
+              font-weight: bold;
+              color: black;
+              padding: 5px;
+            ">
+            Кол-во
+          </th>
+          <th
+            style="
+              font-size: 20px;
+              font-weight: bold;
+              color: black;
+              padding: 5px;
+            ">
+            Цена
+          </th>
+          <th
+            style="
+              font-size: 20px;
+              font-weight: bold;
+              color: black;
+              padding: 5px;
+            ">
+            Сумма
+          </th>
+        </tr>
+        <% reportdata.esf.forEach(function(es) { %>
+        <tr style="height: 40px; width: 200px">
+          <td style="font-size: 20px; padding: 5px"><%= es.n %></td>
+          <td style="font-size: 20px; padding: 5px"><%= es.Наименование %></td>
+          <td style="font-size: 20px; padding: 5px"><%= es.efs1 %> тнг</td>
+          <td style="font-size: 20px; padding: 5px"><%= es.kol_vo %> шт</td>
+          <td style="font-size: 20px; padding: 5px"><%= es.summa %> тнг</td>
+        </tr>
+        <% }) %>
+      </table>
+
+      <div
+        class="itogo"
+        style="
+          position: absolute;
+          right: 0;
+          font-size: 20px;
+          margin-right: 270px;
+          margin-top: 175px;
+          display: flex;
+        ">
+        <div>Итого: <br />Без НДС</div>
+      </div>
       <div
         style="
-          font-weight: bold;
+          position: absolute;
+          right: 0;
           font-size: 20px;
-          margin-top: 10px;
-          color: black;
+          border: 2px solid;
+          width: 200px;
+          height: 45px;
+          margin-right: 38px;
+          margin-top: 175px;
+          display: flex;
         ">
-        Счет на оплату № <%-reportdata.nomer%> от <%-reportdata.today%>
-        <hr style="background-color: black" />
+        <div style="margin-top: 2px; margin-left: 6px">
+          <%-reportdata.itogoEsf%> тг
+        </div>
       </div>
-      <div style="margin-top: 10px">
-        Поставщик :
-        <span style="font-weight: bold;">БИН/ИИН <%-reportdata.bin%> <%-reportdata.IP%>
-        <%-reportdata.address%>
-        </span> 
-      </div>
-      <div style="margin-top: 10px">
-        Покупатель : 
-        <span style="font-weight: bold;">БИН/ИИН <%-reportdata.bin2%> <%-reportdata.nameFirmy%>
-        <%-reportdata.address2%>
-      </span>
-      </div>
-      <div style="margin-top: 10px">Договор : <span style="font-weight: bold;"><%-reportdata.dogovor%></span></div>
-    </div>
-
-    <table
-      style="width: 95%; height: 100%; margin-left: 25px; text-align: left; margin-top: 50px">
-      <tr style="height: 40px">
-        <th style="font-size: 20px; font-weight: bold; color: black">№</th>
-        <th style="font-size: 20px; font-weight: bold; color: black">
-          Наименование
-        </th>
-        <th style="font-size: 20px; font-weight: bold; color: black">Кол-во</th>
-        <th style="font-size: 20px; font-weight: bold; color: black">Цена</th>
-        <th style="font-size: 20px; font-weight: bold; color: black">Сумма</th>
-      </tr>
-      <% reportdata.esf.forEach(function(es) { %>
-      <tr style="height: 40px; overflow: hidden">
-        <td style="font-size: 20px"><%= es.n %></td>
-        <td style="font-size: 20px"><%= es.Наименование %></td>
-        <td style="font-size: 20px">тнг <%= es.efs1 %></td>
-        <td style="font-size: 20px">шт <%= es.kol_vo %></td>
-        <td style="font-size: 20px">тнг <%= es.summa %></td>
-      </tr>
-      <% }) %>
-    </table>
-
-    <div
-      class="itogo"
-      style="
-        position: absolute;
-        right: 0;
-        font-size: 20px;
-        margin-right: 270px;
-        margin-top: 200px;
-        display: flex;
-      ">
-      <div>Итого: <br />Без НДС</div>
-    </div>
-    <div
-      style="
-        position: absolute;
-        right: 0;
-        font-size: 20px;
-        border: 2px solid;
-       
-
-        width: 200px;
-        height: 45px;
-        margin-right: 40px;
-        margin-top: 200px;
-        display: flex;
-      ">
-      <div style="margin-top: 2px"><%-reportdata.itogoEsf%> тг</div>
-    </div>
-    <div style="margin-top: 250px">
-      <div style="font-size: 20px">
-        Всего наименований <%-reportdata.col%> на сумму <%-reportdata.itogoEsf%>
-        KZT
-      </div>
-      <div style="font-weight: bold; margin-top: 30px;">
-        Всего к оплате:<%-reportdata.itogoEsf%> тг
-      </div>
-      <hr style="color: black; margin-top: 10px;" />
-    </div>
-    <div style="margin-top: 40px; position: relative; font-weight: bold; ">
-      <div>
-        Руководитель: _______________________ /<%-reportdata.rukovaditel%>/
-      </div>
-      <img
-        src="<%-reportdata.pechat%>"
+      <div
         style="
-          width: 130px;
-          height: 130px;
           position: absolute;
-          margin-left: 440px;
-        " />
-      <img
-        style="
-          width: 50px;
-          height: 50px;
-          position: absolute;
-          bottom: 1px;
-          margin-left: 185px;
-        "
-        src="<%-reportdata.rospis%>" />
+
+          font-size: 20px;
+          margin-left: 40px;
+          margin-top: 220px;
+          width: 100%;
+        ">
+        <div style="font-size: 20px">
+          Всего наименований <%-reportdata.col%> на сумму
+          <%-reportdata.itogoEsf%> KZT
+        </div>
+        <div style="font-weight: bold; margin-top: 10px">
+          Всего к оплате:
+          <span style="margin-left: 5px"><%-reportdata.itogoEsf%> тг</span>
+        </div>
+        <hr style="color: black; margin-top: 10px; width: 100%" />
+      </div>
+      <div style="margin-top: 320px; position: absolute; font-weight: bold; margin-left: 40px;">
+        <div>
+          Руководитель: _______________________ /<%-reportdata.rukovaditel%>/
+        </div>
+        <img
+          src="<%-reportdata.pechat%>"
+          style="
+            width: 130px;
+            height: 130px;
+            position: absolute;
+            margin-left: 440px;
+          " />
+        <img
+          style="
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            bottom: 1px;
+            margin-left: 185px;
+          "
+          src="<%-reportdata.rospis%>" />
+      </div>
+      <div style="margin-top: 360px; position: absolute; font-weight: bold; margin-left: 40px;">
+        <br />Главный бухгалтер: не предусмотрен
+      </div>
     </div>
-    <div style="margin-top: 20px; font-weight: bold;"><br />Главный бухгалтер: не предусмотрен</div>
   </body>
 </html>
 
