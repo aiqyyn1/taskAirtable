@@ -5,6 +5,6 @@ const bodyParser = require('body-parser');
 const port = 8000;
 app.use(express.urlencoded({ extended: true }));
 
-const reportRouter = require('./src/routes/index');
+const reportRouter = require('./src/routes/router');
 app.get('/blanks', reportRouter);
 app.listen(port, () => console.log(`Port listen in  ${port}`));
