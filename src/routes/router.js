@@ -1,36 +1,38 @@
 require('dotenv').config();
 const Airtable = require('airtable');
 const express = require('express');
+const puppeteer = require('puppeteer');
 const pdf = require('html-pdf');
 const ejs = require('ejs');
 const path = require('path');
 const reportRouter = express.Router();
-reportRouter.use(express.static(__dirname + 'public'));
+
 Airtable.configure({
   endpointUrl: 'https://api.airtable.com',
   apiKey: process.env.API_KEY,
 });
+
 const base = Airtable.base(process.env.BASE);
+
 const formatSumma = (summa) => {
   return (summa = summa
     .replace(
-        new RegExp(
-            '^(\\d{1,2}|\\d{4})(\\d{3})',
-            'g'
-        ),
-        '$1,$2'
+      new RegExp('^(\\d{1,2}|\\d{4})(\\d{3})', 'g'),
+      '$1,$2'
     )
     .replace(/(\d{3})(?=\d)(?!$)/g, '$1,')
     .trim());
-
 };
+
+reportRouter.use(express.static(__dirname + 'public'));
+
 reportRouter.get('/blanks', async (req, res) => {
   const recordID = req.query.recordID;
 
   try {
     const esf = await fetchEsfData(recordID);
-
     const record = await fetchRecordData(recordID);
+
     const name = record.get('Name');
     const IP = record.get('ИП имя (from ИП)');
     const iik = record.get('счет (from ИП)');
@@ -53,7 +55,8 @@ reportRouter.get('/blanks', async (req, res) => {
     const itogoEsf = String(record.get('итого ЭСФ'));
     const col = record.get('кол-во наименований');
     const rukovaditel = record.get('руководитель (from ИП)');
-    let airtableData = {
+
+    const airtableData = {
       IP: IP,
       IIK: iik,
       kbe: kbe,
@@ -76,28 +79,25 @@ reportRouter.get('/blanks', async (req, res) => {
       rospis: rospis,
       nomer: nomer,
     };
+
+    const htmlContent = await ejs.renderFile(
+      path.join(__dirname, '../views/template.ejs'),
+      { reportdata: airtableData }
+    );
+
+
+
+  
+
     const filename = name + '.pdf';
 
-    ejs.renderFile(
-      path.join(__dirname, '../views/template.ejs'),
-      { reportdata: airtableData },
-      (err, data) => {
-        if (err) {
-          console.log(err, 'Error in rendering template');
-        } else {
-          const options = {
-            format: 'A4',
-          };
-          pdf.create(data, options).toFile(filename, function (err, data) {
-            if (err) {
-              console.log('Error creating PDF ' + err);
-            } else {
-              res.download('././' + filename);
-            }
-          });
-        }
+    pdf.create(htmlContent, { format: 'A4' }).toFile(filename, function (err, data) {
+      if (err) {
+        console.log('Error creating PDF ' + err);
+      } else {
+        res.download('././' + filename);
       }
-    );
+    });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
