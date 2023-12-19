@@ -78,7 +78,7 @@ reportRouter.get('/blanks', async (req, res) => {
     const filename = name + '.pdf';
 
     ejs.renderFile(
-      path.join(__dirname, 'template.ejs'),
+      path.join(__dirname, './template.ejs'),
       { reportdata: airtableData },
       (err, data) => {
         if (err) {
