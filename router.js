@@ -74,14 +74,13 @@ reportRouter.get('/blanks', async (req, res) => {
       rospis: rospis,
       nomer: nomer,
     };
-    console.log(airtableData)
+ 
     const filename = name + '.pdf';
 
     ejs.renderFile(
       path.join(__dirname, './template.ejs'),
       { reportdata: airtableData },
       (err, data) => {
-        console.log(data)
         if (err) {
           console.log(err, 'Error in rendering template');
           res.status(500).send('Error in rendering template');
