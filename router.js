@@ -89,6 +89,7 @@ reportRouter.get('/blanks', async (req, res) => {
             format: 'A4',
           };
           pdf.create(data, options).toFile(filename, function (err, data) {
+            console.log(data)
             if (err) {
               console.log('Error creating PDF ' + err);
               res.status(500).send('Error creating PDF');
