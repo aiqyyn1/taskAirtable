@@ -76,7 +76,7 @@ reportRouter.get('/blanks', async (req, res) => {
       nomer: nomer,
     };
 
-    const filename = name + '.pdf';
+    const filename = '1028-Ахметова Адия.pdf'
     const filePath = path.join(__dirname, './public/', filename);
 
     ejs.renderFile(
