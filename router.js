@@ -1,11 +1,10 @@
 require('dotenv').config();
 const Airtable = require('airtable');
-const express = require('express');
 const pdf = require('html-pdf');
 const ejs = require('ejs');
 const path = require('path');
+const express = require('express');
 const reportRouter = express.Router();
-reportRouter.use(express.static(__dirname + 'public'));
 Airtable.configure({
   endpointUrl: 'https://api.airtable.com',
   apiKey: process.env.API_KEY,
@@ -13,29 +12,28 @@ Airtable.configure({
 const base = Airtable.base(process.env.BASE);
 const formatSumma = (summa) => {
   return (summa = summa
-    .replace(
-        new RegExp(
-            '^(\\d{1,2}|\\d{4})(\\d{3})',
-            'g'
-        ),
-        '$1,$2'
-    )
+    .replace(new RegExp('^(\\d{1,2}|\\d{4})(\\d{3})', 'g'), '$1,$2')
     .replace(/(\d{3})(?=\d)(?!$)/g, '$1,')
     .trim());
-
 };
 reportRouter.get('/blanks', async (req, res) => {
   const recordID = req.query.recordID;
 
   try {
-    const esf = await fetchEsfData(recordID);
-
-    const record = await fetchRecordData(recordID);
+    const record = await findRecord(recordID);
+ 
+    const esf = await fetchRecords(recordID);
+    // console.log('lox',esf)
     const name = record.get('Name');
+    // console.log('lox',name);
     const IP = record.get('ИП имя (from ИП)');
+    // console.log(IP);
     const iik = record.get('счет (from ИП)');
+    // console.log(iik);
     const kbe = record.get('кбе (from ИП)');
+    // console.log(kbe);
     const bank = record.get('банк (from ИП)');
+    // console.log(bank);
     const bik = record.get('БИК (from ИП)');
     const pechat = record.get('печать (from ИП)')[0].url;
     const rospis = record.get('роспись (from ИП)')[0].url;
@@ -76,14 +74,17 @@ reportRouter.get('/blanks', async (req, res) => {
       rospis: rospis,
       nomer: nomer,
     };
+    console.log(airtableData)
     const filename = name + '.pdf';
 
     ejs.renderFile(
-      path.join(__dirname, '../views/template.ejs'),
+      path.join(__dirname, './template.ejs'),
       { reportdata: airtableData },
       (err, data) => {
+        console.log(data)
         if (err) {
           console.log(err, 'Error in rendering template');
+          res.status(500).send('Error in rendering template');
         } else {
           const options = {
             format: 'A4',
@@ -91,8 +92,17 @@ reportRouter.get('/blanks', async (req, res) => {
           pdf.create(data, options).toFile(filename, function (err, data) {
             if (err) {
               console.log('Error creating PDF ' + err);
+              res.status(500).send('Error creating PDF');
             } else {
-              res.download('././' + filename);
+              console.log('PDF created successfully:', data);
+              res.download('././' + filename, function (err) {
+                if (err) {
+                  console.log('Error during file download:', err);
+                  res.status(500).send('Error during file download');
+                } else {
+                  console.log('File downloaded successfully');
+                }
+              });
             }
           });
         }
@@ -103,65 +113,51 @@ reportRouter.get('/blanks', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-function getAirtableData(record, esf) {
-  const name = record.get('Name');
-  const IP = record.get('ИП имя (from ИП)');
-  const iik = record.get('счет (from ИП)');
-  // ... (add other fields as needed)
 
-  const airtableData = {
-    IP: IP,
-    IIK: iik,
-    // ... (add other fields as needed)
-  };
-
-  return airtableData;
-}
-async function fetchEsfData(recordID) {
-  let esf = [];
+const fetchRecords = (recordID) => {
+  let esf = []
   return new Promise((resolve, reject) => {
     base('заказы подробно')
       .select({
-        view: 'ЭСФ АВР Нак',
+        view: 'Aikyn',
       })
       .eachPage(
         function page(records, fetchNextPage) {
-          records.forEach(function (record) {
-            const id = record.get('recordID (from заказ номер)');
-            id.map((recId) => {
-              if (recId == recordID) {
-                const n = record.get('№');
-                const naimenovanie = record.get('Наименование1');
-                const efcCena = record.get('ЭФС Цена');
-                const kol_vo = record.get('Кол-во');
-                let summa = String(record.get('Сумма'));
-
-                esf.push({
-                  Наименование: naimenovanie,
-                  n: n,
-                  efs1: efcCena,
-                  kol_vo: kol_vo,
-                  summa: formatSumma(summa),
-                });
-              }
+          try {
+            records.forEach(function (record) {
+              const id = record.get('record_id (from заказ номер)');
+            
+              id.map((recId) => {
+                if (recId == recordID) {
+                  const n = record.get('№');
+          
+                  const naimenovanie = record.get('Наименование1');
+                  const esfCena = record.get('ЭСФ цена');
+                  const kol_vo = record.get('Кол-во');
+                  let summa = String(record.get('ЭСФ Сумма'));
+                
+                  esf.push({
+                    Наименование: naimenovanie,
+                    n: n,
+                    efs1: esfCena,
+                    kol_vo: kol_vo,
+                    summa: formatSumma(summa),
+                  });
+                  resolve(esf);
+                }
+              });
             });
-          });
+          } catch (error) {
+            reject(error);
+          }
           fetchNextPage();
         },
-        function done(err) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(esf);
-          }
-        }
       );
   });
 }
-
-async function fetchRecordData(recordID) {
+const findRecord = (recordID) => {
   return new Promise((resolve, reject) => {
-    base('заказы общее').find(recordID, function (err, record) {
+    base('заказы общее').find(recordID, (err, record) => {
       if (err) {
         reject(err);
       } else {
@@ -169,6 +165,6 @@ async function fetchRecordData(recordID) {
       }
     });
   });
-}
+};
 
 module.exports = reportRouter;
