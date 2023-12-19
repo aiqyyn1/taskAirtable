@@ -5,6 +5,7 @@ const ejs = require('ejs');
 const path = require('path');
 const express = require('express');
 const reportRouter = express.Router();
+
 Airtable.configure({
   endpointUrl: 'https://api.airtable.com',
   apiKey: process.env.API_KEY,
@@ -74,8 +75,9 @@ reportRouter.get('/blanks', async (req, res) => {
       rospis: rospis,
       nomer: nomer,
     };
- 
+
     const filename = name + '.pdf';
+    const filePath = path.join(__dirname, './public/', filename);
 
     ejs.renderFile(
       path.join(__dirname, './template.ejs'),
@@ -88,14 +90,14 @@ reportRouter.get('/blanks', async (req, res) => {
           const options = {
             format: 'A4',
           };
-          pdf.create(data, options).toFile(filename, function (err, data) {
-            console.log(data)
+          pdf.create(data, options).toFile(filePath, function (err, data) {
+            console.log(data);
             if (err) {
               console.log('Error creating PDF ' + err);
               res.status(500).send('Error creating PDF');
             } else {
               console.log('PDF created successfully:', data);
-              res.download('././' + filename, function (err) {
+              res.download(filePath, filename, function (err) {
                 if (err) {
                   console.log('Error during file download:', err);
                   res.status(500).send('Error during file download');
