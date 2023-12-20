@@ -5,7 +5,7 @@ const ejs = require('ejs');
 const path = require('path');
 const express = require('express');
 const reportRouter = express.Router();
-const puppeteer = require('puppeteer');
+
 Airtable.configure({
   endpointUrl: 'https://api.airtable.com',
   apiKey: process.env.API_KEY,
@@ -17,25 +17,6 @@ const formatSumma = (summa) => {
     .replace(/(\d{3})(?=\d)(?!$)/g, '$1,')
     .trim());
 };
-const sanitizeFilename = (filename) => {
-  // Remove invalid characters from the filename
-  return filename.replace(/[^a-zA-Z0-9-_.]/g, '_');
-};
-const generatePdf = async (html, options) => {
-  const browser = await puppeteer.launch({
-    headless: 'new',
-    executablePath: await puppeteer.executablePath(),
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
-  const page = await browser.newPage();
-
-  await page.setContent(html);
-  const pdfBuffer = await page.pdf(options);
-
-  await browser.close();
-
-  return pdfBuffer;
-};
 
 reportRouter.get('/blanks', async (req, res) => {
   const recordID = req.query.recordID;
@@ -44,9 +25,9 @@ reportRouter.get('/blanks', async (req, res) => {
     const record = await findRecord(recordID);
     //  console.log(record)
     const esf = await fetchRecords(recordID);
- 
+
     const name = record.get('Name');
-    const sanitizedFilename = sanitizeFilename(name);
+    // console.log('lox',name);
     const IP = record.get('ИП имя (from ИП)');
     // console.log(IP);
     const iik = record.get('счет (from ИП)');
@@ -95,13 +76,14 @@ reportRouter.get('/blanks', async (req, res) => {
       rospis: rospis,
       nomer: nomer,
     };
-    const filename = name + '.pdf'
-    const filePath = path.join(__dirname, './public/', filename);
+    console.log(airtableData);
+    const filename = name + '.pdf';
+    const filePath = path.join(__dirname, '/public/', filename);
 
     ejs.renderFile(
-      path.join(__dirname, 'template.ejs'),
+      path.join(__dirname, './template.ejs'),
       { reportdata: airtableData },
-      async (err, data) => {
+      (err, data) => {
         if (err) {
           console.log(err, 'Error in rendering template');
           res.status(500).send('Error in rendering template');
@@ -109,14 +91,25 @@ reportRouter.get('/blanks', async (req, res) => {
           const options = {
             format: 'A4',
           };
-          const pdfBuffer = await generatePdf(data, options);
-
-          // Send the PDF as a download attachment
-          res.setHeader('Content-Disposition', `attachment; filename=${sanitizedFilename}.pdf`);
-          res.setHeader('Content-Type', 'application/pdf');
-          res.status(200).end(pdfBuffer);
-        }}
-      
+          pdf.create(data, options).toFile(filePath, function (err, data) {
+            console.log('data', data);
+            if (err) {
+              console.log('Error creating PDF ' + err);
+              res.status(500).send('Error creating PDF');
+            } else {
+              console.log('PDF created successfully:', data);
+              res.download(filePath, filename, function (err) {
+                if (err) {
+                  console.log('Error during file download:', err);
+                  res.status(500).send('Error during file download');
+                } else {
+                  console.log('File downloaded successfully');
+                }
+              });
+            }
+          });
+        }
+      }
     );
   } catch (error) {
     console.error(error);
@@ -125,47 +118,44 @@ reportRouter.get('/blanks', async (req, res) => {
 });
 
 const fetchRecords = (recordID) => {
-  let esf = []
+  let esf = [];
   return new Promise((resolve, reject) => {
     base('заказы подробно')
       .select({
         view: 'Aikyn',
       })
-      .eachPage(
-        function page(records, fetchNextPage) {
-          try {
-            records.forEach(function (record) {
-              const id = record.get('record_id (from заказ номер)');
-              
-              id.map((recId) => {
-                if (recId == recordID) {
-                  const n = record.get('№');
-          
-                  const naimenovanie = record.get('Наименование1');
-                  const esfCena = record.get('ЭСФ цена');
-                  const kol_vo = record.get('Кол-во');
-                  let summa = String(record.get('ЭСФ Сумма'));
-                
-                  esf.push({
-                    Наименование: naimenovanie,
-                    n: n,
-                    efs1: esfCena,
-                    kol_vo: kol_vo,
-                    summa: formatSumma(summa),
-                  });
-           
-                }
-              });
+      .eachPage(function page(records, fetchNextPage) {
+        try {
+          records.forEach(function (record) {
+            const id = record.get('record_id (from заказ номер)');
+
+            id.map((recId) => {
+              if (recId == recordID) {
+                const n = record.get('№');
+
+                const naimenovanie = record.get('Наименование1');
+                const esfCena = record.get('ЭСФ цена');
+                const kol_vo = record.get('Кол-во');
+                let summa = String(record.get('ЭСФ Сумма'));
+
+                esf.push({
+                  Наименование: naimenovanie,
+                  n: n,
+                  efs1: esfCena,
+                  kol_vo: kol_vo,
+                  summa: formatSumma(summa),
+                });
+              }
             });
-            resolve(esf);
-          } catch (error) {
-            reject(error);
-          }
-          fetchNextPage();
-        },
-      );
+          });
+          resolve(esf);
+        } catch (error) {
+          reject(error);
+        }
+        fetchNextPage();
+      });
   });
-}
+};
 const findRecord = (recordID) => {
   return new Promise((resolve, reject) => {
     base('заказы общее').find(recordID, (err, record) => {
