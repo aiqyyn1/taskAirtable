@@ -17,16 +17,31 @@ const formatSumma = (summa) => {
     .replace(/(\d{3})(?=\d)(?!$)/g, '$1,')
     .trim());
 };
+const sanitizeFilename = (filename) => {
+  // Remove invalid characters from the filename
+  return filename.replace(/[^a-zA-Z0-9-_.]/g, '_');
+};
+const generatePdf = async (html, options) => {
+  return new Promise((resolve, reject) => {
+    pdf.create(html, options).toBuffer((err, buffer) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(buffer);
+      }
+    });
+  });
+};
 reportRouter.get('/blanks', async (req, res) => {
   const recordID = req.query.recordID;
 
   try {
     const record = await findRecord(recordID);
- 
+    //  console.log(record)
     const esf = await fetchRecords(recordID);
-    // console.log('lox',esf)
+ 
     const name = record.get('Name');
-    // console.log('lox',name);
+    const sanitizedFilename = sanitizeFilename(name);
     const IP = record.get('ИП имя (from ИП)');
     // console.log(IP);
     const iik = record.get('счет (from ИП)');
@@ -75,14 +90,14 @@ reportRouter.get('/blanks', async (req, res) => {
       rospis: rospis,
       nomer: nomer,
     };
-
-    const filename = '1028-Ахметова Адия.pdf'
+    console.log(airtableData)
+    const filename = name + '.pdf'
     const filePath = path.join(__dirname, './public/', filename);
 
     ejs.renderFile(
-      path.join(__dirname, './template.ejs'),
+      path.join(__dirname, 'template.ejs'),
       { reportdata: airtableData },
-      (err, data) => {
+      async (err, data) => {
         if (err) {
           console.log(err, 'Error in rendering template');
           res.status(500).send('Error in rendering template');
@@ -90,23 +105,12 @@ reportRouter.get('/blanks', async (req, res) => {
           const options = {
             format: 'A4',
           };
-          pdf.create(data, options).toFile(filename, function (err, data) {
-console.log(data)
-            if (err) {
-              console.log('Error creating PDF ' + err);
-              res.status(500).send('Error creating PDF');
-            } else {
-              console.log('PDF created successfully:', data);
-              res.download(filePath, filename, function (err) {
-                if (err) {
-                  console.log('Error during file download:', err);
-                  res.status(500).send('Error during file download');
-                } else {
-                  console.log('File downloaded successfully');
-                }
-              });
-            }
-          });
+          const pdfBuffer = await generatePdf(data, options);
+
+          // Send the PDF as a download attachment
+          res.setHeader('Content-Disposition', `attachment; filename=${sanitizedFilename}.pdf`);
+          res.setHeader('Content-Type', 'application/pdf');
+          res.status(200).end(pdfBuffer);
         }
       }
     );
@@ -128,7 +132,7 @@ const fetchRecords = (recordID) => {
           try {
             records.forEach(function (record) {
               const id = record.get('record_id (from заказ номер)');
-            
+              
               id.map((recId) => {
                 if (recId == recordID) {
                   const n = record.get('№');
@@ -145,10 +149,11 @@ const fetchRecords = (recordID) => {
                     kol_vo: kol_vo,
                     summa: formatSumma(summa),
                   });
-                  resolve(esf);
+           
                 }
               });
             });
+            resolve(esf);
           } catch (error) {
             reject(error);
           }
