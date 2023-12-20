@@ -5,7 +5,7 @@ const ejs = require('ejs');
 const path = require('path');
 const express = require('express');
 const reportRouter = express.Router();
-
+const puppeteer = require('puppeteer');
 Airtable.configure({
   endpointUrl: 'https://api.airtable.com',
   apiKey: process.env.API_KEY,
@@ -22,16 +22,19 @@ const sanitizeFilename = (filename) => {
   return filename.replace(/[^a-zA-Z0-9-_.]/g, '_');
 };
 const generatePdf = async (html, options) => {
-  return new Promise((resolve, reject) => {
-    pdf.create(html, options).toBuffer((err, buffer) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(buffer);
-      }
-    });
+  const browser = await puppeteer.launch({
+    headless: 'new', // Use the new Headless mode
   });
+  const page = await browser.newPage();
+
+  await page.setContent(html);
+  const pdfBuffer = await page.pdf(options);
+
+  await browser.close();
+
+  return pdfBuffer;
 };
+
 reportRouter.get('/blanks', async (req, res) => {
   const recordID = req.query.recordID;
 
