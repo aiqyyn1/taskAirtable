@@ -23,7 +23,9 @@ const sanitizeFilename = (filename) => {
 };
 const generatePdf = async (html, options) => {
   const browser = await puppeteer.launch({
-    headless: 'new', // Use the new Headless mode
+    headless: 'new',
+    executablePath: await puppeteer.executablePath(),
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
   const page = await browser.newPage();
 
