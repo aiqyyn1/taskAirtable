@@ -98,10 +98,7 @@ reportRouter.get('/blanks', async (req, res) => {
       path.join(__dirname, 'template.ejs'),
       { reportdata: airtableData },
       async (err, data) => {
-        if (err) {
-          console.log(err, 'Error in rendering template');
-          res.status(500).send('Error in rendering template');
-        } else {
+    
           const options = {
             format: 'A4',
           };
@@ -112,7 +109,7 @@ reportRouter.get('/blanks', async (req, res) => {
           res.setHeader('Content-Type', 'application/pdf');
           res.status(200).end(pdfBuffer);
         }
-      }
+      
     );
   } catch (error) {
     console.error(error);
