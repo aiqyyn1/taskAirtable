@@ -95,7 +95,6 @@ reportRouter.get('/blanks', async (req, res) => {
       rospis: rospis,
       nomer: nomer,
     };
-    console.log(airtableData)
     const filename = name + '.pdf'
     const filePath = path.join(__dirname, './public/', filename);
 
