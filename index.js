@@ -7,6 +7,6 @@ app.use(express.urlencoded({ extended: true }));
 app.set('views', './template.ejs')
 app.set('view engine', 'ejs')
 const reportRouter = require('./router');
-app.use(express.static('public'));
+
 app.get('/blanks', reportRouter);
 app.listen(port, () => console.log(`Port listen in  ${port}`));

@@ -17,7 +17,7 @@ const formatSumma = (summa) => {
     .replace(/(\d{3})(?=\d)(?!$)/g, '$1,')
     .trim());
 };
-
+reportRouter.use(express.static(__dirname + "public" ));
 reportRouter.get('/blanks', async (req, res) => {
   const recordID = req.query.recordID;
 
@@ -76,9 +76,9 @@ reportRouter.get('/blanks', async (req, res) => {
       rospis: rospis,
       nomer: nomer,
     };
-    console.log(airtableData);
+  
     const filename = name + '.pdf';
-    const filePath = path.join(__dirname, '/public/', filename);
+
 
     ejs.renderFile(
       path.join(__dirname, './template.ejs'),
@@ -90,15 +90,24 @@ reportRouter.get('/blanks', async (req, res) => {
         } else {
           const options = {
             format: 'A4',
+            base: 'file:///' + __dirname,
+  
+            header: {
+              height: '2mm',
+            },
+  
+            footer: {
+              height: '20mm',
+            },
           };
-          pdf.create(data, options).toFile(filePath, function (err, data) {
-            console.log('data', data);
+  
+          pdf.create(data, options).toFile(filename, function (err, data) {
             if (err) {
               console.log('Error creating PDF ' + err);
               res.status(500).send('Error creating PDF');
             } else {
               console.log('PDF created successfully:', data);
-              res.download(filePath, filename, function (err) {
+              res.download(filename, function (err) {
                 if (err) {
                   console.log('Error during file download:', err);
                   res.status(500).send('Error during file download');
