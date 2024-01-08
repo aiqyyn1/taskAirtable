@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const path = require('path');
 const port = 8001;
+app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }));
 app.set('views', './template.ejs')
 app.set('view engine', 'ejs')

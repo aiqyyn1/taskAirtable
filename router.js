@@ -17,7 +17,7 @@ const formatSumma = (summa) => {
     .replace(/(\d{3})(?=\d)(?!$)/g, '$1,')
     .trim());
 };
-reportRouter.use(express.static(__dirname + '/public'));
+reportRouter.use(express.static(__dirname + 'public'));
 reportRouter.get('/blanks', async (req, res) => {
   const recordID = req.query.recordID;
 
