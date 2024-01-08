@@ -17,7 +17,7 @@ const formatSumma = (summa) => {
     .replace(/(\d{3})(?=\d)(?!$)/g, '$1,')
     .trim());
 };
-reportRouter.use(express.static(__dirname + "public" ));
+reportRouter.use(express.static(__dirname + '/public'));
 reportRouter.get('/blanks', async (req, res) => {
   const recordID = req.query.recordID;
 
@@ -76,50 +76,46 @@ reportRouter.get('/blanks', async (req, res) => {
       rospis: rospis,
       nomer: nomer,
     };
-  
+
     const filename = name + '.pdf';
 
+    const templatePath = path.resolve(__dirname, './template.ejs');
+    ejs.renderFile(templatePath, { reportdata: airtableData }, (err, data) => {
+      if (err) {
+        console.log(err, 'Error in rendering template');
+        res.status(500).send('Error in rendering template');
+      } else {
+        const options = {
+          format: 'A4',
+          base: 'file:///' + __dirname,
 
-    ejs.renderFile(
-      path.join(__dirname, './template.ejs'),
-      { reportdata: airtableData },
-      (err, data) => {
-        if (err) {
-          console.log(err, 'Error in rendering template');
-          res.status(500).send('Error in rendering template');
-        } else {
-          const options = {
-            format: 'A4',
-            base: 'file:///' + __dirname,
-  
-            header: {
-              height: '2mm',
-            },
-  
-            footer: {
-              height: '20mm',
-            },
-          };
-  
-          pdf.create(data, options).toFile(filename, function (err, data) {
-            if (err) {
-              console.log('Error creating PDF ' + err);
-              res.status(500).send('Error creating PDF');
-            } else {
-              console.log('PDF created successfully:', data);
-              res.download(filename, function (err) {
-                if (err) {
-                  console.log('Error during file download:', err);
-                  res.status(500).send('Error during file download');
-                } else {
-                  console.log('File downloaded successfully');
-                }
-              });
-            }
-          });
-        }
+          header: {
+            height: '2mm',
+          },
+
+          footer: {
+            height: '20mm',
+          },
+        };
+
+        pdf.create(data, options).toFile(filename, function (err, data) {
+          if (err) {
+            console.log('Error creating PDF ' + err);
+            res.status(500).send('Error creating PDF');
+          } else {
+            console.log('PDF created successfully:', data);
+            res.download(filename, function (err) {
+              if (err) {
+                console.log('Error during file download:', err);
+                res.status(500).send('Error during file download');
+              } else {
+                console.log('File downloaded successfully');
+              }
+            });
+          }
+        });
       }
-    );
+    });
   } catch (error) {
     console.error(error);
     res.status(500).send('Internal Server Error');
